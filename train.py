@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, roc_auc_score
 
+import dotenv
+dotenv.load_dotenv()
 # Load data
 df = pd.read_csv('data/churn_data.csv')
 
@@ -35,3 +37,15 @@ with open('models/churn_model.pkl', 'wb') as f:
     pickle.dump(model, f)
 
 print("Model saved to models/churn_model.pkl")
+
+
+#// Upload model to S3 for serving through KSERVE 
+import boto3 as boto
+s3=boto.client('s3')
+
+bucket_name = 'mlops37987'
+key='models/serving/churn_model.pkl'
+
+s3.upload_file('models/churn_model.pkl', bucket_name, key)
+
+print(f"uploading model to s3://{bucket_name}/{key}")
